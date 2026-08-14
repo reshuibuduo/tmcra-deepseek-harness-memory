@@ -21,38 +21,65 @@
 - 内容送往 TMCRA 前，会清理常见 API key、Bearer Token、密码、私钥、验证码和带凭据的 URL。
 - 召回异常默认不阻断 Harness 回答；写入失败会进入本地持久化待写队列，下次提问前重试。
 
+## 让每一次项目协作都成为可继续使用的知识
+
+一个长期项目中，真正有价值的信息通常散落在许多轮对话里：需求为什么这样确定、方案受过哪些约束、哪些尝试已经失败、代码改到了哪里、测试得到什么结果、下一步还要完成什么。对话窗口关闭以后，这些上下文很容易被遗忘。再次开始工作时，用户往往需要重新解释项目，Agent 也可能重复调查、重复试错，甚至沿用已经失效的结论。
+
+接入 TMCRA 后，Harness 会在协作过程中自动记录用户表达的目标、要求、决定、修正和工作偏好，同时记录 Agent 完成的分析、实现、测试、问题定位与进度。用户说过的话和 Agent 做过的工作会被分别保存，后续能够判断一项内容是用户作出的决定、Agent 给出的建议，还是已经完成并验证的结果。
+
+随着项目推进，这些协作记录会逐步整理为：
+
+- **项目现状**：当前目标、需求与约束、已经完成的工作、正在处理的问题、未完成事项和建议的下一步；
+- **决策与实施过程**：方案选择及其原因、重要变更、实验与测试结果、失败尝试、故障原因和最终处理方法；
+- **可复用的经验**：经过实际项目验证的方法、排障路径、设计原则、研究笔记、领域知识和容易踩到的坑；
+- **个人工作背景**：用户明确表达的偏好、习惯、常用工具、协作方式和长期关注的主题。
+
+这些内容会随项目继续推进而更新。新的结论形成后，系统会更新项目的当前状态，同时保留此前的过程和依据。不同项目分别组织；同一项目中的多次对话可以共享已经积累的背景。用户开始一轮新对话时，Agent 可以先取得与当前问题相关的项目知识，再继续回答和执行任务。
+
+用户可以在 TMCRA 网页端或桌面应用中查看记忆库和知识图谱，搜索项目经历，回到原始对话核对内容，并删除错误、过时或不希望继续保留的记忆。启用本地知识库同步后，稳定的项目知识也可以继续整理到 Obsidian，成为个人可长期维护的资料。
+
+这套能力适合持续数周或数月的开发、研究、产品设计与多 Agent 协作。它减少重复说明、重复调查和重复试错，让项目进度能够跨对话延续，也让一次项目中形成的经验在之后的工作中继续发挥作用。
+
 ## 环境要求
 
 - Node.js `22.19.0` 或更新版本
 - DeepSeek Harness `0.1.0-rc.6`
 - Harness 管理插件时需要 `pnpm` 位于 `PATH`
-- 具备 `memory:read` 与 `memory:write` 权限的 TMCRA 范围令牌
+- 一个 TMCRA 账号。登录命令会自动创建插件所需的范围令牌。
 
 ## 安装技术预览包
 
 ```bash
-dsh plugin --profile web add https://github.com/reshuibuduo/tmcra-deepseek-harness-memory/releases/download/v0.1.0/tmcra-deepseek-harness-memory-0.1.0.tgz
+dsh plugin --profile web add https://github.com/reshuibuduo/tmcra-deepseek-harness-memory/releases/download/v0.1.1/tmcra-deepseek-harness-memory-0.1.1.tgz
+dsh plugin --profile web exec tmcra-harness-memory login
 dsh --profile web --dump-config
 dsh web
 ```
 
 Harness Web UI 默认地址为 `http://127.0.0.1:3080`。
 
-压缩包内含 `cordis.patch.yml`，安装后会自动加入指定 Profile 的配置层。建议使用 Release 中已经构建好的 `.tgz`。下载到本地后，也可以执行 `dsh plugin --profile web add ./tmcra-deepseek-harness-memory-0.1.0.tgz`。从 Git 源码安装可能还需要在 `pnpm` 中单独允许构建脚本。
+压缩包内含 `cordis.patch.yml`，安装后会自动加入指定 Profile 的配置层。建议使用 Release 中已经构建好的 `.tgz`。下载到本地后，也可以执行 `dsh plugin --profile web add ./tmcra-deepseek-harness-memory-0.1.1.tgz`。从 Git 源码安装可能还需要在 `pnpm` 中单独允许构建脚本。
 
-当前 Windows 版 Harness 预览工具在处理“包含空格或非 ASCII 字符的压缩包绝对路径”时，可能会错误地重新拼接路径。遇到此问题时，先把压缩包复制到不含空格的短路径，例如 `D:\\dsh-packages\\tmcra-deepseek-harness-memory-0.1.0.tgz`，再执行安装。
+当前 Windows 版 Harness 预览工具在处理“包含空格或非 ASCII 字符的压缩包绝对路径”时，可能会错误地重新拼接路径。遇到此问题时，先把压缩包复制到不含空格的短路径，例如 `D:\\dsh-packages\\tmcra-deepseek-harness-memory-0.1.1.tgz`，再执行安装。
 
-## 配置凭据
+## 连接 TMCRA 账号
 
-在 `$DSH_HOME/.credentials.yaml` 中加入：
+安装后执行：
 
-```yaml
-TMCRA_API_KEY: "你的 TMCRA 范围令牌"
-TMCRA_GLOBAL_SCOPE: "账户被分配的精确全局 scope"
-TMCRA_PROJECT_SCOPE_PREFIX: "账户获准使用的项目 scope 前缀"
+```bash
+dsh plugin --profile web exec tmcra-harness-memory login
 ```
 
-建议使用短有效期、最小权限令牌。Harness 不会把凭据值写入普通设置或模型请求；但如果模型控制的工具与 Harness 使用同一个系统用户，该工具仍可能读取这个系统用户有权访问的本地文件。
+命令会启动带 PKCE 保护的设备授权，并打开 `tmcra.com`。注册或登录账号，核对权限并确认页面上的设备代码。TMCRA 随后签发仅含 `memory:read`、`memory:write` 权限的令牌，同时下发账户全局 scope 和项目 scope 前缀。插件会把这些值保存到 Harness 管理的 `$DSH_HOME/.credentials.yaml`，用户无需手工复制 API key。
+
+```bash
+dsh plugin --profile web exec tmcra-harness-memory status
+dsh plugin --profile web exec tmcra-harness-memory logout
+```
+
+`status` 只显示当前 Profile 的连接状态，不输出令牌。`logout` 只删除 TMCRA 相关凭据，其他 Harness 凭据会原样保留。电脑遗失或不再可信时，还应在 TMCRA 个人控制台中撤销该连接。
+
+Harness 不会把凭据值写入普通设置或模型请求。如果模型控制的工具和 Harness 使用同一个系统用户，它仍可能读取该系统用户有权访问的本地文件，因此只应在可信本地账号中保留连接。
 
 插件默认配置：
 
@@ -62,6 +89,7 @@ TMCRA_PROJECT_SCOPE_PREFIX: "账户获准使用的项目 scope 前缀"
       name: tmcra-deepseek-harness-memory
       config:
         baseUrl: https://api.tmcra.com
+        baseUrlEnv: TMCRA_API_BASE_URL
         apiKeyEnv: TMCRA_API_KEY
         globalScopeEnv: TMCRA_GLOBAL_SCOPE
         projectScopePrefixEnv: TMCRA_PROJECT_SCOPE_PREFIX
@@ -117,12 +145,13 @@ npm run test:remote
 
 ## 当前边界
 
-- Harness 内部还没有 TMCRA 设置页与设备授权界面。
+- 账号连接目前采用 CLI 引导加浏览器确认；Harness 内部暂时没有原生 TMCRA 设置页。
 - 暂未提供 Harness 历史会话导入。
 - 长会话中的上下文增长遵循 Harness 的召回消息与压缩机制，仍需补充长时间工作负载测试。
 - 当前只验证了 Harness `0.1.0-rc.6`。
 - npm 包尚未正式发布；当前安装产物是已经审计的 `.tgz`。
 - 使用真实 DeepSeek 模型完成回答，需要用户自己的 DeepSeek 凭据；记忆生命周期测试本身不依赖该凭据。
+- 记忆库和知识图谱通过 TMCRA 网页端或桌面应用查看；Harness 接入在对话过程中后台运行。
 
 ## 许可
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 - 2026-08-14
+
+- Add a PKCE-protected TMCRA account login for ordinary users.
+- Store the issued API base URL, scoped token, global scope, and project-scope prefix in the Harness credential store.
+- Add `login`, `status`, and `logout` plugin commands without exposing token values.
+- Recover interrupted device authorization without starting a second authorization request.
+- Preserve unrelated Harness credentials during account connection and logout.
+
 ## 0.1.0 - 2026-08-14
 
 Technical preview for DeepSeek Harness `0.1.0-rc.6`.

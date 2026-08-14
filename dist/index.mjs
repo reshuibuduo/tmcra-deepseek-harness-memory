@@ -1462,12 +1462,14 @@ function processSafeRandom() {
 const name = "tmcra-memory";
 const inject = ["agents"];
 const DEFAULT_BASE_URL = "https://api.tmcra.com";
+const DEFAULT_BASE_URL_ENV = "TMCRA_API_BASE_URL";
 const DEFAULT_API_KEY_ENV = "TMCRA_API_KEY";
 const DEFAULT_GLOBAL_SCOPE_ENV = "TMCRA_GLOBAL_SCOPE";
 const DEFAULT_PROJECT_SCOPE_PREFIX_ENV = "TMCRA_PROJECT_SCOPE_PREFIX";
 const MAX_SCOPE_LENGTH = 128;
 const Config = z.object({
 	baseUrl: z.string().default(DEFAULT_BASE_URL),
+	baseUrlEnv: z.string().default(DEFAULT_BASE_URL_ENV),
 	apiKeyEnv: z.string().default(DEFAULT_API_KEY_ENV),
 	globalScopeEnv: z.string().default(DEFAULT_GLOBAL_SCOPE_ENV),
 	projectScopePrefixEnv: z.string().default(DEFAULT_PROJECT_SCOPE_PREFIX_ENV),
@@ -1676,6 +1678,7 @@ async function resolveCredential(ctx, reference) {
 	return cleanText(credentials === void 0 ? process.env[ref] : (await credentials.resolve(ref))?.value, reference);
 }
 async function resolveOperationConfig(ctx, config) {
+	const baseUrl = await resolveCredential(ctx, cleanText(config.baseUrlEnv, "baseUrlEnv") ?? DEFAULT_BASE_URL_ENV) ?? cleanText(config.baseUrl, "baseUrl") ?? DEFAULT_BASE_URL;
 	const apiKeyReference = cleanText(config.apiKeyEnv, "apiKeyEnv") ?? DEFAULT_API_KEY_ENV;
 	const apiKey = await resolveCredential(ctx, apiKeyReference);
 	if (!apiKey) throw new Error(`tmcra-memory: credential ${apiKeyReference} is not configured`);
@@ -1687,6 +1690,7 @@ async function resolveOperationConfig(ctx, config) {
 	if (!projectScopePrefix) throw new Error(`tmcra-memory: project scope prefix ${projectPrefixReference} is not configured`);
 	return {
 		apiKey,
+		baseUrl,
 		globalScope: validateScope(globalScope, "globalScope"),
 		projectScopePrefix: validateScope(projectScopePrefix, "projectScopePrefix")
 	};
@@ -1709,7 +1713,7 @@ function recalledMessage(prepared) {
 function lifecycleFor(config, operation, agent, projectScope, pendingQueue, stage) {
 	const assistantAgentId = harnessAgentId(agent);
 	return new TMCRAMemoryLifecycle(new TMCRAClient({
-		baseUrl: cleanText(config.baseUrl, "baseUrl") ?? DEFAULT_BASE_URL,
+		baseUrl: operation.baseUrl,
 		apiKey: operation.apiKey,
 		defaultTimeoutMs: stage === "recall" ? validatePositiveTimeout(config.recallTimeoutMs, 3e4, "recallTimeoutMs") : validatePositiveTimeout(config.ingestTimeoutMs, 3e4, "ingestTimeoutMs"),
 		clientPlatform: "deepseek_harness",
@@ -1739,6 +1743,7 @@ function apply(ctx, config) {
 	const writebackByProject = /* @__PURE__ */ new Map();
 	const pendingQueue = new FilePendingTurnQueue(cleanText(config.pendingQueuePath, "pendingQueuePath") ?? defaultPendingQueuePath());
 	const detached = /* @__PURE__ */ new Set();
+	let missingCredentialWarningShown = false;
 	const track = (operation) => {
 		detached.add(operation);
 		operation.finally(() => detached.delete(operation));
@@ -1766,6 +1771,7 @@ function apply(ctx, config) {
 		const key = turnKey(agent, turn);
 		try {
 			const operation = await resolveOperationConfig(ctx, config);
+			missingCredentialWarningShown = false;
 			const projectScope = cleanText(config.projectScope, "projectScope") ? validateScope(config.projectScope, "projectScope") : deriveProjectScope(operation.projectScopePrefix, agent, config.projectId);
 			await reconcilePending(agent, operation, projectScope);
 			const prepared = await lifecycleFor(config, operation, agent, projectScope, pendingQueue, "recall").prepareTurn(prompt, {
@@ -1785,6 +1791,8 @@ function apply(ctx, config) {
 		} catch (error) {
 			preparedByAgentTurn.delete(key);
 			if ((config.recallFailureMode ?? "continue") === "raise") throw error;
+			if (isMissingCredentialError(error) && missingCredentialWarningShown) return downstream;
+			if (isMissingCredentialError(error)) missingCredentialWarningShown = true;
 			warn(ctx, "recall", error);
 			return downstream;
 		}
@@ -1815,6 +1823,9 @@ function apply(ctx, config) {
 		const prefix = `${String(agent.session.header.id)}:`;
 		for (const key of preparedByAgentTurn.keys()) if (key.startsWith(prefix)) preparedByAgentTurn.delete(key);
 	});
+}
+function isMissingCredentialError(error) {
+	return error instanceof Error && /is not configured$/u.test(error.message);
 }
 const testing = Object.freeze({
 	assistantText,

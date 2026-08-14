@@ -34,6 +34,7 @@ export const name = "tmcra-memory";
 export const inject = ["agents"];
 
 const DEFAULT_BASE_URL = "https://api.tmcra.com";
+const DEFAULT_BASE_URL_ENV = "TMCRA_API_BASE_URL";
 const DEFAULT_API_KEY_ENV = "TMCRA_API_KEY";
 const DEFAULT_GLOBAL_SCOPE_ENV = "TMCRA_GLOBAL_SCOPE";
 const DEFAULT_PROJECT_SCOPE_PREFIX_ENV = "TMCRA_PROJECT_SCOPE_PREFIX";
@@ -42,6 +43,8 @@ const MAX_SCOPE_LENGTH = 128;
 export interface Config {
   /** TMCRA Memory API base URL. */
   baseUrl?: string;
+  /** Credential-store reference populated by device authorization. */
+  baseUrlEnv?: string;
   /** Credential reference resolved from ctx.credentials on every operation. */
   apiKeyEnv?: string;
   /** Credential reference containing the exact account-global scope. */
@@ -68,6 +71,7 @@ export interface Config {
 
 export const Config: z<Config> = z.object({
   baseUrl: z.string().default(DEFAULT_BASE_URL),
+  baseUrlEnv: z.string().default(DEFAULT_BASE_URL_ENV),
   apiKeyEnv: z.string().default(DEFAULT_API_KEY_ENV),
   globalScopeEnv: z.string().default(DEFAULT_GLOBAL_SCOPE_ENV),
   projectScopePrefixEnv: z.string().default(DEFAULT_PROJECT_SCOPE_PREFIX_ENV),
@@ -91,6 +95,7 @@ interface PreparedHarnessTurn {
 
 interface ResolvedOperationConfig {
   apiKey: string;
+  baseUrl: string;
   globalScope: string;
   projectScopePrefix: string;
 }
@@ -373,6 +378,10 @@ async function resolveCredential(ctx: Context, reference: string): Promise<strin
 }
 
 async function resolveOperationConfig(ctx: Context, config: Config): Promise<ResolvedOperationConfig> {
+  const baseUrlReference = cleanText(config.baseUrlEnv, "baseUrlEnv") ?? DEFAULT_BASE_URL_ENV;
+  const baseUrl = await resolveCredential(ctx, baseUrlReference)
+    ?? cleanText(config.baseUrl, "baseUrl")
+    ?? DEFAULT_BASE_URL;
   const apiKeyReference = cleanText(config.apiKeyEnv, "apiKeyEnv") ?? DEFAULT_API_KEY_ENV;
   const apiKey = await resolveCredential(ctx, apiKeyReference);
   if (!apiKey) throw new Error(`tmcra-memory: credential ${apiKeyReference} is not configured`);
@@ -388,6 +397,7 @@ async function resolveOperationConfig(ctx: Context, config: Config): Promise<Res
   }
   return {
     apiKey,
+    baseUrl,
     globalScope: validateScope(globalScope, "globalScope"),
     projectScopePrefix: validateScope(projectScopePrefix, "projectScopePrefix"),
   };
@@ -416,7 +426,7 @@ function lifecycleFor(
 ): TMCRAMemoryLifecycle {
   const assistantAgentId = harnessAgentId(agent);
   const client = new TMCRAClient({
-    baseUrl: cleanText(config.baseUrl, "baseUrl") ?? DEFAULT_BASE_URL,
+    baseUrl: operation.baseUrl,
     apiKey: operation.apiKey,
     defaultTimeoutMs: stage === "recall"
       ? validatePositiveTimeout(config.recallTimeoutMs, 30_000, "recallTimeoutMs")
@@ -457,6 +467,7 @@ export function apply(ctx: Context, config: Config): void {
     cleanText(config.pendingQueuePath, "pendingQueuePath") ?? defaultPendingQueuePath(),
   );
   const detached = new Set<Promise<void>>();
+  let missingCredentialWarningShown = false;
 
   const track = (operation: Promise<void>): void => {
     detached.add(operation);
@@ -508,6 +519,7 @@ export function apply(ctx: Context, config: Config): void {
     const key = turnKey(agent, turn);
     try {
       const operation = await resolveOperationConfig(ctx, config);
+      missingCredentialWarningShown = false;
       const projectScope = cleanText(config.projectScope, "projectScope")
         ? validateScope(config.projectScope!, "projectScope")
         : deriveProjectScope(operation.projectScopePrefix, agent, config.projectId);
@@ -529,6 +541,8 @@ export function apply(ctx: Context, config: Config): void {
     } catch (error) {
       preparedByAgentTurn.delete(key);
       if ((config.recallFailureMode ?? "continue") === "raise") throw error;
+      if (isMissingCredentialError(error) && missingCredentialWarningShown) return downstream;
+      if (isMissingCredentialError(error)) missingCredentialWarningShown = true;
       warn(ctx, "recall", error);
       return downstream;
     }
@@ -574,6 +588,10 @@ export function apply(ctx: Context, config: Config): void {
       if (key.startsWith(prefix)) preparedByAgentTurn.delete(key);
     }
   });
+}
+
+function isMissingCredentialError(error: unknown) {
+  return error instanceof Error && /is not configured$/u.test(error.message);
 }
 
 export const testing = Object.freeze({

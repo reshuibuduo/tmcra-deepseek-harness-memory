@@ -1,10 +1,13 @@
 {
   "name": "tmcra-deepseek-harness-memory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Automatic TMCRA recall, injection, and role-separated writeback for DeepSeek Harness",
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.mts",
+  "bin": {
+    "tmcra-harness-memory": "dist/cli.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
@@ -14,6 +17,8 @@
   "files": [
     "dist/index.mjs",
     "dist/index.d.mts",
+    "dist/cli.mjs",
+    "dist/cli.d.mts",
     "cordis.patch.yml",
     "README.md",
     "README.zh-CN.md",
@@ -79,7 +84,9 @@
     }
   },
   "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.1"
+    "@deepseek-ai/dsh-atomic-write": "^0.1.0-rc.6",
+    "@deepseek-ai/schemastery": "^3.18.1",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.0.1",

@@ -11,6 +11,8 @@ declare const inject: string[];
 interface Config {
   /** TMCRA Memory API base URL. */
   baseUrl?: string;
+  /** Credential-store reference populated by device authorization. */
+  baseUrlEnv?: string;
   /** Credential reference resolved from ctx.credentials on every operation. */
   apiKeyEnv?: string;
   /** Credential reference containing the exact account-global scope. */
