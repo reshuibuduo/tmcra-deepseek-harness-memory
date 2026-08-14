@@ -21,18 +21,24 @@ The repository vendors the reviewable TypeScript client and lifecycle modules us
 - Redacts common API keys, bearer tokens, passwords, private keys, verification codes, and credential-bearing URLs before data crosses the TMCRA network boundary.
 - Fails open on recall by default and keeps failed writeback in a crash-safe local outbox.
 
-## From project work to accumulated knowledge
+## Turn every project collaboration into knowledge you can keep using
 
-The plugin continuously captures both sides of real project work: the goals, constraints, decisions, corrections, and preferences expressed by the user, together with the investigations, implementations, changes, and progress produced by the Agent. Every record keeps its actor and source provenance. TMCRA then organizes the committed evidence in the background.
+The most valuable context in a long-running project is usually scattered across many conversations: why a requirement was chosen, which constraints shaped a design, what has already failed, where the implementation stopped, what the tests showed, and what should happen next. When a conversation ends, that context is easy to lose. Returning to the work often means explaining the project again, repeating investigations, or acting on conclusions that are no longer current.
 
-As a project develops, TMCRA can derive:
+With TMCRA connected, Harness records the goals, requirements, decisions, corrections, and working preferences expressed by the user. It also records the Agent's investigations, implementations, tests, diagnoses, and progress. User statements and Agent work remain distinct, so later conversations can tell the difference between a user decision, an Agent recommendation, and a result that was actually completed and verified.
 
-- project memory: requirements, decisions, milestones, current state, incidents, and open questions;
-- reusable knowledge: concepts, methods, explanations, research notes, and lessons learned;
-- personal context: explicit profile facts, preferences, and people;
-- a viewable memory and knowledge graph (`Visual Atlas`) plus a personal knowledge base, where claims remain linked to supporting evidence and carry `confirmed`, `provisional`, `superseded`, or `open` status.
+As the project develops, those collaboration records are organized into:
 
-Users can inspect these results in the TMCRA web console and desktop application. The graph and knowledge base can be regenerated as memory changes without rewriting the original source records. This Harness plugin handles capture, recall, injection, and writeback; the TMCRA service performs the later graph and knowledge curation.
+- **Current project state:** goals, requirements, constraints, completed work, active problems, unfinished tasks, and suggested next steps;
+- **Decision and implementation history:** why an approach was selected, important changes, experiments and test results, failed attempts, incident causes, and the solution that worked;
+- **Reusable experience:** methods validated in real work, debugging paths, design principles, research notes, domain knowledge, and recurring pitfalls;
+- **Personal working context:** explicitly stated preferences, habits, tools, collaboration patterns, and long-term interests.
+
+This knowledge continues to change with the project. New conclusions update the current view while the earlier reasoning and history remain available. Separate projects stay separate, while conversations within the same project can share what has already been learned. At the start of a new conversation, the Agent can retrieve the project knowledge relevant to the current request before it answers or takes action.
+
+Users can browse and search the memory library and knowledge graph in the TMCRA web or desktop app, return to the original conversation to verify an item, and delete memories that are incorrect, outdated, or no longer wanted. When local knowledge-base sync is enabled, stable project knowledge can also be organized into Obsidian for long-term personal use.
+
+This is designed for development, research, product work, and multi-Agent collaboration that continues for weeks or months. It reduces repeated explanation, duplicated investigation, and repeated trial and error. Project progress can continue across conversations, and experience gained in one piece of work remains useful in the next.
 
 ## Requirements
 
@@ -136,7 +142,7 @@ On 2026-08-14, the preview passed a production API acceptance run: a new project
 - Compatibility is tested only against Harness `0.1.0-rc.6`.
 - The package has not yet been published to npm; the reviewed `.tgz` is the current installation artifact.
 - A live DeepSeek-provider answer test requires the user's own DeepSeek credential; the memory lifecycle test itself does not require one.
-- The Visual Atlas and personal knowledge base are viewed in TMCRA clients; this preview does not embed those viewers inside Harness.
+- The memory library and knowledge graph are opened from the TMCRA web or desktop app; the Harness integration runs in the background during conversations.
 
 ## License
 
