@@ -1,6 +1,6 @@
-# TMCRA × DeepSeek Harness 长期记忆插件
+# TMCRA × DeepSeek Harness：跨软件、跨会话的项目记忆
 
-这是 TMCRA 面向 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的自动记忆接入。
+在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)、Codex 和其他已接入 TMCRA 的工具之间切换，也不需要重新介绍项目。
 
 每轮收到用户问题后，插件会并行召回“用户全局记忆”和“当前项目记忆”，把证据写入 Harness 可审计的会话记录。回答完成后，用户陈述与 Agent 回答会以两个角色明确的记录写回 TMCRA。
 
@@ -10,8 +10,17 @@
 
 [English](./README.md)
 
+## 换软件、换会话，继续同一个项目
+
+TMCRA 为每个账号维护一份用户全局记忆，并为每个项目建立相互隔离的项目记忆。两个受支持的工具使用同一个 TMCRA 账号，并识别到同一个项目身份时，就会读取和更新同一份项目记忆。因此，在 Harness 中完成的工作可以在之后的 Codex 会话中被召回；Codex 写入的新进度，也能在切回 Harness 后继续使用。
+
+Agent 回答前，TMCRA 会找回与当前问题有关的用户要求、决策、偏好、Agent 工作进度、实现结果、测试结论、未解决问题和下一步计划。当前回合完成后，新的用户陈述与 Agent 结果会分角色更新到同一份记忆中，并保留来源信息。切换软件或新开会话时，用户无需从头解释项目背景。
+
+跨软件衔接只使用已经进入 TMCRA 的记忆，并要求两端识别到同一个项目身份。TMCRA 不会把无关项目混在一起：`.tmcra/project.json`、Git 项目标识和账号下发的项目 Scope 前缀共同维持稳定边界；`session_id` 只承担项目内部的来源追踪，不会形成第三个召回孤岛。
+
 ## 已实现能力
 
+- 同一个项目可以在 Codex、DeepSeek Harness 等 TMCRA 接入工具之间继续推进。
 - 每轮第一次模型请求前自动召回，无需 Agent 主动调用工具。
 - 新开一个 Harness 对话后，可以继续同一项目的工作进度。
 - `session_id` 用于项目内部的来源追踪，不会被设计成第三个独立召回范围。

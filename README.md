@@ -1,6 +1,6 @@
-# TMCRA Memory for DeepSeek Harness
+# TMCRA for DeepSeek Harness — Cross-App, Cross-Conversation Project Memory
 
-Automatic cross-conversation memory for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
+Move between [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), Codex, and other TMCRA-connected tools without explaining the project again.
 
 This plugin connects Harness lifecycle events to the TMCRA Memory API. A new human prompt recalls account-global and current-project evidence in parallel, injects the resulting evidence into the model-visible session log, and writes the completed user/assistant turn back as two role-separated records.
 
@@ -10,8 +10,17 @@ The repository vendors the reviewable TypeScript client and lifecycle modules us
 
 [中文说明](./README.zh-CN.md)
 
+## Continue the same project across apps and conversations
+
+TMCRA gives every account a global memory scope and every project an isolated project scope. When two supported tools use the same TMCRA account and resolve the same project identity, they read and update the same project memory. Work completed in Harness can therefore be recalled in a later Codex session, and progress written by Codex can be recalled after switching back to Harness.
+
+Before the Agent answers, TMCRA retrieves the relevant user requirements, decisions, preferences, Agent progress, implementation results, tests, unresolved problems, and next steps. After the turn completes, the new human prompt and Agent result update the shared memory as separate role-labelled records with their source metadata preserved. Switching software or opening a new conversation no longer requires a fresh project introduction.
+
+Cross-app continuity applies to memories that have reached TMCRA and requires both connectors to resolve the same project identity. TMCRA does not merge unrelated projects: `.tmcra/project.json`, Git identity, and the account-issued project-scope prefix keep project boundaries stable, while `session_id` remains provenance inside the project rather than a separate recall silo.
+
 ## What it does
 
+- Continues one project across TMCRA-connected tools such as Codex and DeepSeek Harness.
 - Recalls user-global and current-project memory before the first model request of each turn.
 - Continues project work across separate Harness conversations.
 - Keeps `session_id` as provenance inside a project scope; it does not create a third recall silo.

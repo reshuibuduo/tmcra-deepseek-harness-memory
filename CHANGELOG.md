@@ -9,6 +9,7 @@
 - Recover interrupted device authorization without starting a second authorization request.
 - Preserve unrelated Harness credentials during account connection and logout.
 - Clarify production acceptance accounting and document the verified cleanup of disposable sessions, indexes, and credentials.
+- Document cross-app and cross-conversation continuity through the shared TMCRA account and project scopes while preserving project isolation.
 
 ## 0.1.0 - 2026-08-14
 
