@@ -21,6 +21,19 @@ The repository vendors the reviewable TypeScript client and lifecycle modules us
 - Redacts common API keys, bearer tokens, passwords, private keys, verification codes, and credential-bearing URLs before data crosses the TMCRA network boundary.
 - Fails open on recall by default and keeps failed writeback in a crash-safe local outbox.
 
+## From project work to accumulated knowledge
+
+The plugin continuously captures both sides of real project work: the goals, constraints, decisions, corrections, and preferences expressed by the user, together with the investigations, implementations, changes, and progress produced by the Agent. Every record keeps its actor and source provenance. TMCRA then organizes the committed evidence in the background.
+
+As a project develops, TMCRA can derive:
+
+- project memory: requirements, decisions, milestones, current state, incidents, and open questions;
+- reusable knowledge: concepts, methods, explanations, research notes, and lessons learned;
+- personal context: explicit profile facts, preferences, and people;
+- a viewable memory and knowledge graph (`Visual Atlas`) plus a personal knowledge base, where claims remain linked to supporting evidence and carry `confirmed`, `provisional`, `superseded`, or `open` status.
+
+Users can inspect these results in the TMCRA web console and desktop application. The graph and knowledge base can be regenerated as memory changes without rewriting the original source records. This Harness plugin handles capture, recall, injection, and writeback; the TMCRA service performs the later graph and knowledge curation.
+
 ## Requirements
 
 - Node.js `22.19.0` or newer
@@ -123,6 +136,7 @@ On 2026-08-14, the preview passed a production API acceptance run: a new project
 - Compatibility is tested only against Harness `0.1.0-rc.6`.
 - The package has not yet been published to npm; the reviewed `.tgz` is the current installation artifact.
 - A live DeepSeek-provider answer test requires the user's own DeepSeek credential; the memory lifecycle test itself does not require one.
+- The Visual Atlas and personal knowledge base are viewed in TMCRA clients; this preview does not embed those viewers inside Harness.
 
 ## License
 
