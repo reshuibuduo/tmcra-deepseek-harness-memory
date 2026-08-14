@@ -2,6 +2,7 @@
 
 ## 0.1.1 - 2026-08-14
 
+- Rename the public package and repository to `dsh-tmcra-memory` to follow the DeepSeek Harness community convention.
 - Add a PKCE-protected TMCRA account login for ordinary users.
 - Store the issued API base URL, scoped token, global scope, and project-scope prefix in the Harness credential store.
 - Add `login`, `status`, and `logout` plugin commands without exposing token values.

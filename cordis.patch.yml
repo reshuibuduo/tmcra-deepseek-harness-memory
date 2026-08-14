@@ -1,6 +1,6 @@
 - insert:
     - id: tmcra-memory
-      name: tmcra-deepseek-harness-memory
+      name: dsh-tmcra-memory
       config:
         baseUrl: https://api.tmcra.com
         baseUrlEnv: TMCRA_API_BASE_URL

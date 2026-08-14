@@ -90,7 +90,7 @@ async function postJson(fetchImpl: FetchLike, url: string, body: Record<string, 
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "User-Agent": "tmcra-deepseek-harness-memory/0.1.1",
+        "User-Agent": "dsh-tmcra-memory/0.1.1",
       },
       body: JSON.stringify(body),
       signal: controller.signal,

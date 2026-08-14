@@ -1,12 +1,12 @@
 {
-  "name": "tmcra-deepseek-harness-memory",
+  "name": "dsh-tmcra-memory",
   "version": "0.1.1",
   "description": "Automatic TMCRA recall, injection, and role-separated writeback for DeepSeek Harness",
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.mts",
   "bin": {
-    "tmcra-harness-memory": "dist/cli.mjs"
+    "dsh-tmcra-memory": "dist/cli.mjs"
   },
   "exports": {
     ".": {
@@ -50,10 +50,10 @@
   "homepage": "https://tmcra.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reshuibuduo/tmcra-deepseek-harness-memory.git"
+    "url": "git+https://github.com/reshuibuduo/dsh-tmcra-memory.git"
   },
   "bugs": {
-    "url": "https://github.com/reshuibuduo/tmcra-deepseek-harness-memory/issues"
+    "url": "https://github.com/reshuibuduo/dsh-tmcra-memory/issues"
   },
   "license": "Apache-2.0",
   "engines": {

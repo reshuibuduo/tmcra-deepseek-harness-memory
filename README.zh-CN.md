@@ -47,34 +47,36 @@
 - Harness 管理插件时需要 `pnpm` 位于 `PATH`
 - 一个 TMCRA 账号。登录命令会自动创建插件所需的范围令牌。
 
+发布初期，TMCRA 账号免费使用，暂不设置记忆写入与召回额度上限。后续如果调整免费政策，会提前公告，并在用户确认后生效。
+
 ## 安装技术预览包
 
 ```bash
-dsh plugin --profile web add https://github.com/reshuibuduo/tmcra-deepseek-harness-memory/releases/download/v0.1.1/tmcra-deepseek-harness-memory-0.1.1.tgz
-dsh plugin --profile web exec tmcra-harness-memory login
+dsh plugin --profile web add https://github.com/reshuibuduo/dsh-tmcra-memory/releases/download/v0.1.1/dsh-tmcra-memory-0.1.1.tgz
+dsh plugin --profile web exec dsh-tmcra-memory login
 dsh --profile web --dump-config
 dsh web
 ```
 
 Harness Web UI 默认地址为 `http://127.0.0.1:3080`。
 
-压缩包内含 `cordis.patch.yml`，安装后会自动加入指定 Profile 的配置层。建议使用 Release 中已经构建好的 `.tgz`。下载到本地后，也可以执行 `dsh plugin --profile web add ./tmcra-deepseek-harness-memory-0.1.1.tgz`。从 Git 源码安装可能还需要在 `pnpm` 中单独允许构建脚本。
+压缩包内含 `cordis.patch.yml`，安装后会自动加入指定 Profile 的配置层。建议使用 Release 中已经构建好的 `.tgz`。下载到本地后，也可以执行 `dsh plugin --profile web add ./dsh-tmcra-memory-0.1.1.tgz`。从 Git 源码安装可能还需要在 `pnpm` 中单独允许构建脚本。
 
-当前 Windows 版 Harness 预览工具在处理“包含空格或非 ASCII 字符的压缩包绝对路径”时，可能会错误地重新拼接路径。遇到此问题时，先把压缩包复制到不含空格的短路径，例如 `D:\\dsh-packages\\tmcra-deepseek-harness-memory-0.1.1.tgz`，再执行安装。
+当前 Windows 版 Harness 预览工具在处理“包含空格或非 ASCII 字符的压缩包绝对路径”时，可能会错误地重新拼接路径。遇到此问题时，先把压缩包复制到不含空格的短路径，例如 `D:\\dsh-packages\\dsh-tmcra-memory-0.1.1.tgz`，再执行安装。
 
 ## 连接 TMCRA 账号
 
 安装后执行：
 
 ```bash
-dsh plugin --profile web exec tmcra-harness-memory login
+dsh plugin --profile web exec dsh-tmcra-memory login
 ```
 
-命令会启动带 PKCE 保护的设备授权，并打开 `tmcra.com`。注册或登录账号，核对权限并确认页面上的设备代码。TMCRA 随后签发仅含 `memory:read`、`memory:write` 权限的令牌，同时下发账户全局 scope 和项目 scope 前缀。插件会把这些值保存到 Harness 管理的 `$DSH_HOME/.credentials.yaml`，用户无需手工复制 API key。
+命令会启动带 PKCE 保护的设备授权，并打开 `tmcra.com`。首次使用需要注册 TMCRA 账号；已有账号可直接登录。核对权限并确认页面上的设备代码后，TMCRA 会签发仅含 `memory:read`、`memory:write` 权限的令牌，同时下发账户全局 scope 和项目 scope 前缀。插件会把这些值保存到 Harness 管理的 `$DSH_HOME/.credentials.yaml`，用户无需手工复制 API key。
 
 ```bash
-dsh plugin --profile web exec tmcra-harness-memory status
-dsh plugin --profile web exec tmcra-harness-memory logout
+dsh plugin --profile web exec dsh-tmcra-memory status
+dsh plugin --profile web exec dsh-tmcra-memory logout
 ```
 
 `status` 只显示当前 Profile 的连接状态，不输出令牌。`logout` 只删除 TMCRA 相关凭据，其他 Harness 凭据会原样保留。电脑遗失或不再可信时，还应在 TMCRA 个人控制台中撤销该连接。
@@ -86,7 +88,7 @@ Harness 不会把凭据值写入普通设置或模型请求。如果模型控制
 ```yaml
 - insert:
     - id: tmcra-memory
-      name: tmcra-deepseek-harness-memory
+      name: dsh-tmcra-memory
       config:
         baseUrl: https://api.tmcra.com
         baseUrlEnv: TMCRA_API_BASE_URL

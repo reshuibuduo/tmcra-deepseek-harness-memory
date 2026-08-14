@@ -47,34 +47,36 @@ This is designed for development, research, product work, and multi-Agent collab
 - `pnpm` on `PATH` for Harness plugin management
 - A TMCRA account. The login command creates the scoped plugin token for you.
 
+During the initial release period, TMCRA accounts are free to use with no memory-ingest or recall quota. Any later change to this policy will be announced in advance and will take effect only after user confirmation.
+
 ## Install the preview tarball
 
 ```bash
-dsh plugin --profile web add https://github.com/reshuibuduo/tmcra-deepseek-harness-memory/releases/download/v0.1.1/tmcra-deepseek-harness-memory-0.1.1.tgz
-dsh plugin --profile web exec tmcra-harness-memory login
+dsh plugin --profile web add https://github.com/reshuibuduo/dsh-tmcra-memory/releases/download/v0.1.1/dsh-tmcra-memory-0.1.1.tgz
+dsh plugin --profile web exec dsh-tmcra-memory login
 dsh --profile web --dump-config
 dsh web
 ```
 
 Harness serves its Web UI at `http://127.0.0.1:3080` by default.
 
-The package contributes `cordis.patch.yml`, so the install command activates the plugin in the selected profile. Prefer the prebuilt release tarball. A locally downloaded copy can also be installed with `dsh plugin --profile web add ./tmcra-deepseek-harness-memory-0.1.1.tgz`. Installing from a Git source may require an explicit `pnpm` build-script allowance.
+The package contributes `cordis.patch.yml`, so the install command activates the plugin in the selected profile. Prefer the prebuilt release tarball. A locally downloaded copy can also be installed with `dsh plugin --profile web add ./dsh-tmcra-memory-0.1.1.tgz`. Installing from a Git source may require an explicit `pnpm` build-script allowance.
 
-On the current Harness preview for Windows, an absolute tarball path containing spaces or non-ASCII characters may be re-anchored incorrectly by `dsh plugin add`. If that happens, copy the tarball to a short path without spaces, such as `D:\\dsh-packages\\tmcra-deepseek-harness-memory-0.1.1.tgz`, and install from that path.
+On the current Harness preview for Windows, an absolute tarball path containing spaces or non-ASCII characters may be re-anchored incorrectly by `dsh plugin add`. If that happens, copy the tarball to a short path without spaces, such as `D:\\dsh-packages\\dsh-tmcra-memory-0.1.1.tgz`, and install from that path.
 
 ## Connect your TMCRA account
 
 Run the login command after installation:
 
 ```bash
-dsh plugin --profile web exec tmcra-harness-memory login
+dsh plugin --profile web exec dsh-tmcra-memory login
 ```
 
-The command starts a PKCE-protected device authorization and opens `tmcra.com`. Register or sign in, review the requested permissions, then approve the displayed code. TMCRA issues a restricted `memory:read` / `memory:write` token together with the account-global scope and project-scope prefix. The plugin stores those values in Harness's managed `$DSH_HOME/.credentials.yaml`; you do not copy an API key by hand.
+The command starts a PKCE-protected device authorization and opens `tmcra.com`. First-time users need to create a TMCRA account; existing users can sign in directly. Review the requested permissions and approve the displayed code. TMCRA then issues a restricted `memory:read` / `memory:write` token together with the account-global scope and project-scope prefix. The plugin stores those values in Harness's managed `$DSH_HOME/.credentials.yaml`; you do not copy an API key by hand.
 
 ```bash
-dsh plugin --profile web exec tmcra-harness-memory status
-dsh plugin --profile web exec tmcra-harness-memory logout
+dsh plugin --profile web exec dsh-tmcra-memory status
+dsh plugin --profile web exec dsh-tmcra-memory logout
 ```
 
 `status` reports whether the local Harness profile is connected without printing the token. `logout` removes only the TMCRA entries and preserves other Harness credentials. If the computer is lost or no longer trusted, revoke the connection from the TMCRA personal console as well.
@@ -86,7 +88,7 @@ Default plugin configuration:
 ```yaml
 - insert:
     - id: tmcra-memory
-      name: tmcra-deepseek-harness-memory
+      name: dsh-tmcra-memory
       config:
         baseUrl: https://api.tmcra.com
         baseUrlEnv: TMCRA_API_BASE_URL

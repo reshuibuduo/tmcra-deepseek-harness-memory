@@ -58,7 +58,7 @@ async function postJson(fetchImpl, url, body) {
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
-				"User-Agent": "tmcra-deepseek-harness-memory/0.1.1"
+				"User-Agent": "dsh-tmcra-memory/0.1.1"
 			},
 			body: JSON.stringify(body),
 			signal: controller.signal
@@ -414,7 +414,7 @@ async function main() {
 			ok: true,
 			...status
 		});
-		else process.stdout.write(status.configured ? `TMCRA is configured in ${status.credentialsPath}.\n` : `TMCRA is not configured. Run: tmcra-harness-memory login\n`);
+		else process.stdout.write(status.configured ? `TMCRA is configured in ${status.credentialsPath}.\n` : `TMCRA is not configured. Run: dsh-tmcra-memory login\n`);
 		return;
 	}
 	if (command === "logout") {
@@ -427,7 +427,7 @@ async function main() {
 		else process.stdout.write(`TMCRA credentials were removed from ${path}. Revoke the connection in your TMCRA account if this device is no longer trusted.\n`);
 		return;
 	}
-	process.stdout.write(`Usage:\n  tmcra-harness-memory login [--no-open] [--auth-base-url URL] [--dsh-home PATH] [--json]\n  tmcra-harness-memory status [--dsh-home PATH] [--json]\n  tmcra-harness-memory logout [--dsh-home PATH] [--json]\n`);
+	process.stdout.write(`Usage:\n  dsh-tmcra-memory login [--no-open] [--auth-base-url URL] [--dsh-home PATH] [--json]\n  dsh-tmcra-memory status [--dsh-home PATH] [--json]\n  dsh-tmcra-memory logout [--dsh-home PATH] [--json]\n`);
 }
 const invokedPath = process.argv[1] ? pathToFileURL(process.argv[1]).href : "";
 if (import.meta.url === invokedPath) await main().catch((error) => {

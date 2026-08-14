@@ -8,7 +8,7 @@
  * prompt and the assistant's visible text are ingested as two role-separated
  * records with stable idempotency.
  *
- * @module tmcra-deepseek-harness-memory
+ * @module dsh-tmcra-memory
  */
 
 import { createHash } from "node:crypto";

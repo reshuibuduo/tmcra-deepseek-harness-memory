@@ -1457,7 +1457,7 @@ function processSafeRandom() {
 * prompt and the assistant's visible text are ingested as two role-separated
 * records with stable idempotency.
 *
-* @module tmcra-deepseek-harness-memory
+* @module dsh-tmcra-memory
 */
 const name = "tmcra-memory";
 const inject = ["agents"];
