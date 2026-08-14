@@ -1,0 +1,13 @@
+- insert:
+    - id: tmcra-memory
+      name: tmcra-deepseek-harness-memory
+      config:
+        baseUrl: https://api.tmcra.com
+        apiKeyEnv: TMCRA_API_KEY
+        globalScopeEnv: TMCRA_GLOBAL_SCOPE
+        projectScopePrefixEnv: TMCRA_PROJECT_SCOPE_PREFIX
+        evidenceMode: auto
+        recallFailureMode: continue
+        waitForIngest: false
+        recallTimeoutMs: 30000
+        ingestTimeoutMs: 30000
