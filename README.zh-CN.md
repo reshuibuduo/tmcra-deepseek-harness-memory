@@ -141,9 +141,9 @@ TMCRA_REMOTE_PROJECT_SCOPE_PREFIX=... \
 npm run test:remote
 ```
 
-它核验写入、任务完成、新会话召回与待写队列清空。`TMCRA_REMOTE_CLEANUP_API_KEY` 是可选项，只用于删除一次性测试会话；插件日常令牌仍只需要 `memory:read` 与 `memory:write`。回答端使用记录型测试 Adapter，因此不会产生模型 Token 费用。
+它核验写入、任务完成、新会话召回与待写队列清空。`TMCRA_REMOTE_CLEANUP_API_KEY` 是可选项，只用于删除一次性测试会话；插件日常令牌仍只需要 `memory:read` 与 `memory:write`。回答端使用记录型测试 Adapter，因此不会消耗外部回答模型的 Token 或费用；TMCRA 记忆处理链路自身的模型用量仍会单独计入服务端账本。
 
-2026 年 8 月 14 日，技术预览通过了生产 API 验收：全新项目的两个完整回合写成四条分角色记忆，第二个独立 Harness 会话成功取回用户检查点与 Agent 进度。共享套餐账本记录了两次写入事件（共 53 个估算 Token）和一次有效召回，平台归因为 `deepseek_harness`，成员明细归到测试用户。验收结束后，测试分组已取消，全部测试密钥与令牌均已注销。
+2026 年 8 月 14 日，技术预览通过了生产 API 验收：全新项目的两个完整回合写成四条分角色记忆，第二个独立 Harness 会话成功取回用户检查点与 Agent 进度。服务端账本在 `deepseek_harness` 平台下记录了两次写入事件（共 53 个估算写入 Token）和两次召回请求：第一次面向全新 Scope，按设计容错放行；第二次完成有效的跨会话召回。记忆处理链路另记录 7,894 个模型 Token，已知模型 API 成本为 ¥0.00。验收结束后，两个一次性 Session 均已删除；相关记忆记录、服务消息、Session 记录、活动 Base/Delta 索引指针和外键错误均为 0。测试设备连接、上游范围令牌与本地 Harness 凭据也已全部注销或移除。
 
 ## 当前边界
 

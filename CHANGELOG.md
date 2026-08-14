@@ -8,6 +8,7 @@
 - Add `login`, `status`, and `logout` plugin commands without exposing token values.
 - Recover interrupted device authorization without starting a second authorization request.
 - Preserve unrelated Harness credentials during account connection and logout.
+- Clarify production acceptance accounting and document the verified cleanup of disposable sessions, indexes, and credentials.
 
 ## 0.1.0 - 2026-08-14
 
